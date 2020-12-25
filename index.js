@@ -26,7 +26,7 @@ client.on('message', function(message) {
         title: `${author.username} vous invite à jouer à Duck Game`,
         description: `${author.username} a créé une partie de Duck Game et vous invite à la rejoindre. :duck:
 
-Clique-sur le lien ci-dessous si tu te sens prêt !
+Clique-sur le lien ci-dessous si tu te sens prêt ! :muscle:
 `,
         color: '#27ae60',
         fields: [
