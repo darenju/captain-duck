@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const config = require('./config.json');
 const invites = require('./commands/invites');
 const stats = require('./commands/stats');
+const guns = require('./commands/guns');
 const help = require('./commands/help');
 
 const client = new Discord.Client();
@@ -19,4 +20,5 @@ client.on('ready', function() {
 
 invites.setup(client);
 stats.setup(client);
+guns.setup(client);
 help.setup(client);

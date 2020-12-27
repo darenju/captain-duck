@@ -1,0 +1,76 @@
+{
+  "Explosives": [
+    "Banana",
+    "Banana Cluster",
+    "Bazooka",
+    "Grenade",
+    "Grenade Cannon",
+    "Grenade Launcher",
+    "Mine"
+  ],
+  "Fire": [
+    "Fire Extinguisher",
+    "Flame Thrower",
+    "Flare Gun",
+    "Matchbox",
+    "Roman Candle"
+  ],
+  "Lasers": [
+    "Death Ray",
+    "Laser Rifle",
+    "Pew Pew Laser",
+    "Phaser",
+    "Plasma Blaster",
+    "Quad Laser",
+    "WAGNUS"
+  ],
+  "Machine Guns": [
+    "AK-47",
+    "Chaindart",
+    "Chaingun",
+    "SMG"
+  ],
+  "Melee": [
+    "Chainsaw",
+    "Turbo Chainsaw",
+    "Energy Scimitar",
+    "Sledgehammer",
+    "Sword"
+  ],
+  "Miscellaneous": [
+    "Camping Gun",
+    "Dartgun",
+    "Fire Crackers",
+    "Good Book",
+    "Keytar",
+    "Magnet Gun",
+    "Mind Control Ray",
+    "Net Gun",
+    "RC Controller",
+    "Saxophone",
+    "Trombone",
+    "Trumpet"
+  ],
+  "Pistols": [
+    "Dueling Pistol",
+    "Machine Pistol",
+    "Mag Blaster",
+    "Magnum",
+    "Old Pistol",
+    "Pistol",
+    "Snubby Pistol",
+    "Suicide Pistol"
+  ],
+  "Rifles": [
+    "Dandylion",
+    "Musket",
+    "Sharpshot",
+    "Sniper"
+  ],
+  "Shotguns": [
+    "Blunderbuss",
+    "Combat Shotgun",
+    "Shotgun",
+    "Virtual Shotgun"
+  ]
+}
