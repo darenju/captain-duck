@@ -1,4 +1,9 @@
 {
   "BOT_TOKEN": "NzkyMDczMzY0OTg5NTQyNDIw.X-YZzg.9nOFxW7ZIsG36V8cOSlqdDl0FCc",
-  "CHANNEL_NAME": "invitations-duck-game"
+  "CHANNEL_NAME": "invitations-duck-game",
+  "BOT_MESSAGES": [
+    "version 1.0",
+    "!help pour aide",
+    "Invitations Duck Game"
+  ]
 }
