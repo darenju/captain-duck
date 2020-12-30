@@ -13,6 +13,7 @@
     "axios": "^0.21.1",
     "discord.js": "^12.5.1",
     "node-html-parser": "^2.0.0",
+    "sqlite3": "^5.0.0",
     "xml2js": "^0.4.23"
   }
 }

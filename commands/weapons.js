@@ -63,7 +63,7 @@ function setup(client) {
           console.log(error);
         });
     }
-  })
+  });
 }
 
 module.exports = {
