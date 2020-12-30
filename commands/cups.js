@@ -15,12 +15,29 @@ function setup(client) {
     if (content === '!cups') {
       const fields = [];
 
+      let index = 0;
       database.each('SELECT * FROM players ORDER BY cups DESC', function(err, row) {
+        const cups = parseInt(row.cups, 10);
+        let medal = cups === 0 ? ':medal:' : '';
+        if (index === 0) {
+          medal = ':first_place:';
+        }
+        if (index === 1) {
+          medal = ':second_place:';
+        }
+        if (index === 2) {
+          medal = ':third_place:';
+        }
+
+        const name = medal + ' ' + row.nickname;
+
         fields.push({
-          name: row.nickname,
-          value: row.cups,
+          name,
+          value: cups,
           inline: false,
         });
+
+        index++;
       }, function(err) {
         message.reply(embed({
           title: ':trophy: Classement Duck Game :trophy:',
