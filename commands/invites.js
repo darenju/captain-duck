@@ -51,12 +51,6 @@ Clique-sur le lien ci-dessous si tu te sens prêt ! :muscle:
           });
         });
       }
-      else {
-        // Delete the message…
-        message.delete({
-          reason: 'Ceci n’est pas un lien d’invitation Duck Game !',
-        });
-      }
     }
   });
 }
