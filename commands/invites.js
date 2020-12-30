@@ -11,7 +11,7 @@ function setup(client) {
 
     // If in invite channel…
     if (name === config.CHANNEL_NAME) {
-      if (content.startsWith('steam://openurl/')) {
+      if (content.startsWith('steam://joinlobby/312530/')) {
         const expire = new Date();
         expire.setHours(expire.getHours() + 1);
 
