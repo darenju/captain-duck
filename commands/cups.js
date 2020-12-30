@@ -20,13 +20,13 @@ function setup(client) {
         const cups = parseInt(row.cups, 10);
         let medal = cups === 0 ? ':medal:' : '';
 
-        if (index === 0) {
+        if (index === 0 && cups > 0) {
           medal = ':first_place:';
         }
-        if (index === 1) {
+        if (index === 1 && cups > 0) {
           medal = ':second_place:';
         }
-        if (index === 2) {
+        if (index === 2 && cups > 0) {
           medal = ':third_place:';
         }
 
