@@ -11,7 +11,7 @@ const helpText =
 
 :arrow_right: \`!cups\` : Affiche le classement Duck Game.
 
-:arrow_right: \`!cups [utilisateur] [n]\` : Donne \`n\` coupe·s à l’utilisateur.
+:arrow_right: \`!cups [mention] [n]\` : Donne \`n\` coupe·s à l’utilisateur mentionné.
 
 :arrow_right: \`!help\` : Affiche ce manuel d’aide.
 `;

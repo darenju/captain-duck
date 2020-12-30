@@ -1,10 +1,10 @@
 const sqlite3 = require('sqlite3');
 const path = require('path');
-const { embed } = require('../utils');
+const { embed, getUserFromMention } = require('../utils');
 
 function setup(client) {
   client.on('message', function(message) {
-    const { author, content } = message;
+    const { author, content, mentions } = message;
 
     if (author.bot || !content.startsWith('!cups')) {
       return;
@@ -48,7 +48,8 @@ function setup(client) {
         }));
       });
     } else {
-      const [_, nickname, cupsToAdd] = content.match(/!cups\s(.*)\s(\d)+/) || [];
+      const [_, mention, cupsToAdd] = content.match(/!cups\s(.*)\s(\d)+/) || [];
+      const nickname = getUserFromMention(mention, client).username;
 
       const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
 
@@ -59,7 +60,7 @@ function setup(client) {
       req.get(nickname, function(err, row) {
         if (!row) {
           const add = database.prepare('INSERT INTO players VALUES (?, ?)');
-          add.run(nickname, cupsToAdd, function(err) {
+          add.run(nickname, parseInt(cupsToAdd, 10), function(err) {
             if (!err) {
               reply();
             }
@@ -69,7 +70,7 @@ function setup(client) {
           const update = database.prepare('UPDATE players SET cups = ? WHERE nickname = ?');
           const cups = parseInt(row.cups, 10);
 
-          update.run(cups + cupsToAdd, nickname, function(err) {
+          update.run(cups + parseInt(cupsToAdd, 10), nickname, function(err) {
             if (!err) {
               reply();
             }
