@@ -19,14 +19,17 @@ function setup(client) {
       database.each('SELECT * FROM players ORDER BY cups DESC', function(err, row) {
         const cups = parseInt(row.cups, 10);
         let medal = cups === 0 ? ':medal:' : '';
-        if (index === 0) {
-          medal = ':first_place:';
-        }
-        if (index === 1) {
-          medal = ':second_place:';
-        }
-        if (index === 2) {
-          medal = ':third_place:';
+
+        if (cups > 0) {
+          if (index === 0) {
+            medal = ':first_place:';
+          }
+          if (index === 1) {
+            medal = ':second_place:';
+          }
+          if (index === 2) {
+            medal = ':third_place:';
+          }
         }
 
         const name = medal + ' ' + row.nickname;
