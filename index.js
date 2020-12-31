@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const { BOT_TOKEN } = require('./bot.json');
 const config = require('./config.json');
 const invites = require('./commands/invites');
 const stats = require('./commands/stats');
@@ -7,7 +8,7 @@ const cups = require('./commands/cups');
 const help = require('./commands/help');
 
 const client = new Discord.Client();
-client.login(config.BOT_TOKEN);
+client.login(BOT_TOKEN);
 client.on('ready', function() {
   let message = 0;
   const { BOT_MESSAGES } = config;
