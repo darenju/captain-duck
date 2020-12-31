@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 const path = require('path');
-const { embed, getUserFromMention } = require('../utils');
+const { embed, getUserFromMention, db } = require('../utils');
 
 function setup(client) {
   client.on('message', function(message) {
@@ -10,7 +10,7 @@ function setup(client) {
       return;
     }
 
-    const database = new sqlite3.Database(path.resolve(__dirname, '../database.db'));
+    const database = db();
 
     if (content === '!cups') {
       const fields = [];
@@ -57,7 +57,7 @@ function setup(client) {
 
       req.get(nickname, function(err, row) {
         if (!row) {
-          const add = database.prepare('INSERT INTO players VALUES (?, ?)');
+          const add = database.prepare('INSERT INTO players (nickname, cups) VALUES (?, ?)');
           add.run(nickname, parseInt(cupsToAdd, 10), function(err) {
             if (!err) {
               reply();

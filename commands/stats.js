@@ -1,5 +1,5 @@
 const axios = require('axios');
-const database = require('../database');
+const { embed, db } = require('../utils');
 
 const API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxNzcxZDA3MC02MGQwLTAxMzgtMmI2MS0zOWFmMzcyZTk3NzMiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNTg2OTA0NTU1LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6ImRhcmVuanUtbGl2ZS1jIn0.uCJXiJd-KpA45AR9PJl0NTfytVmX0FVAkIAuJTAdYeA';
 const platform = 'steam';
@@ -89,7 +89,7 @@ const statsFields = {
   ':crossed_swords: Plus long frag': 'longestKill',
 };
 
-function displayStats(allStats, mode, author, message) {
+function displayStats(allStats, mode, username, message) {
   const stats = allStats[mode];
 
   const fields = [];
@@ -102,19 +102,16 @@ function displayStats(allStats, mode, author, message) {
     });
   });
 
-  const embed = {
-    title: `Statistiques PUBG de ${author.username} (${mode.toUpperCase()})`,
+  message.reply(embed({
+    title: `Statistiques PUBG de ${username} (${mode.toUpperCase()})`,
     description: `Voici vos statistiques (${mode.toUpperCase()}) depuis vos débuts sur le jeu.`,
-    color: '#27ae60',
     fields,
-  };
-
-  message.reply({ embed });
+  }));
 }
 
 function setup(client) {
   client.on('message', function(message) {
-    const { author, content } = message;
+    const { author: { username }, content } = message;
 
     if (content.startsWith('!link ')) {
       const nickname = content.replace('!link ', '').trim();
@@ -122,36 +119,59 @@ function setup(client) {
       getPlayerId(nickname)
         .then(function (playerId) {
           if (playerId) {
-            const players = database.read();
-            players[author.id] = playerId;
-            database.write(players);
-            message.reply(':white_check_mark: Ton nom de joueur a bien été associé !');
+            const database = db();
+            const exists = database.prepare('SELECT pubg_id FROM players WHERE nickname = ?');
+            exists.get(username, function(err, row) {
+              let statement;
+
+              // Player exists, update.
+              if (row) {
+                statement = database.prepare('UPDATE players SET pubg_id = ? WHERE nickname = ?');
+              } else {
+                statement = database.prepare('INSERT INTO players (pubg_id, nickname, cups) VALUES (?, ?, 0)');
+              }
+
+              if (statement.run(playerId, username)) {
+                message.reply(':white_check_mark: Ton nom de joueur a bien été associé !');
+                exists.finalize(function() {
+                  statement.finalize(function (err) {
+                    database.close();
+                  });
+                });
+              }
+            });
           } else {
             message.reply(':warning: Oups… Impossible de trouver ce joueur… Erreur de frappe ?');
           }
         });
     } else if (content.startsWith('!stats')) {
-      const players = database.read();
-      const playerId = players[author.id];
+      const database = db();
+      const fetch = database.prepare('SELECT pubg_id FROM players WHERE nickname = ?');
 
-      if (!playerId) {
-        message.reply(':warning: Impossible de te trouver dans la base de données… As-tu bien associé ton nom de joueur avec `!link [nomjoueur]` ?');
-      } else {
-        getStats(playerId)
-          .then(function (stats) {
-            const perspectives = [];
+      fetch.get(username, function(err, row) {
+        if (!row) {
+          message.reply(':warning: Impossible de te trouver dans la base de données… As-tu bien associé ton nom de joueur avec `!link [nomjoueur]` ?');
+        } else {
+          getStats(row.pubg_id)
+            .then(function (stats) {
+              const perspectives = [];
 
-            if (content === '!stats') {
-              perspectives.push('fpp', 'tpp');
-            } else {
-              perspectives.push(content === '!statsfpp' ? 'fpp' : 'tpp');
-            }
+              if (content === '!stats') {
+                perspectives.push('fpp', 'tpp');
+              } else {
+                perspectives.push(content === '!statsfpp' ? 'fpp' : 'tpp');
+              }
 
-            perspectives.forEach(function (perspective) {
-              displayStats(stats, perspective, author, message);
+              perspectives.forEach(function (perspective) {
+                displayStats(stats, perspective, username, message);
+              });
             });
-          });
-      }
+        }
+
+        fetch.finalize(function(err) {
+          database.close();
+        });
+      });
     }
   });
 }
