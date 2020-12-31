@@ -1,4 +1,5 @@
 const config = require('../config.json');
+const { embed } = require('../utils');
 
 function setup(client) {
   client.on('message', function (message) {
@@ -19,34 +20,29 @@ function setup(client) {
         const expireMinute = expire.getMinutes();
         const expireTime = `${expireHour > 10 ? expireHour : '0' + expireHour}:${expireMinute > 10 ? expireMinute : '0' + expireMinute}`;
 
-        const embed = {
-          title: `${author.username} vous invite à jouer à Duck Game`,
-          description: `${author.username} a créé une partie de Duck Game et vous invite à la rejoindre. :duck:
+        message.delete().then(function () {
+          channel.send(embed({
+            title: `${author.username} vous invite à jouer à Duck Game`,
+            description: `${author.username} a créé une partie de Duck Game et vous invite à la rejoindre. :duck:
 
 Clique-sur le lien ci-dessous si tu te sens prêt ! :muscle:
 `,
-          color: '#27ae60',
-          fields: [
-            {
-              name: 'Le lien',
-              value: content,
-              inline: false,
+            fields: [
+              {
+                name: 'Le lien',
+                value: content,
+                inline: false,
+              },
+              {
+                name: 'Expiration',
+                value: expireTime,
+                inline: true,
+              },
+            ],
+            footer: {
+              text: 'N’oubliez pas le talc !',
             },
-            {
-              name: 'Expiration',
-              value: expireTime,
-              inline: true,
-            },
-          ],
-          footer: {
-            text: 'N’oubliez pas le talc !',
-          },
-        };
-
-        message.delete().then(function () {
-          channel.send({
-            embed,
-          }).then(function (invitation) {
+          })).then(function (invitation) {
             invitation.delete({ timeout: 60 * 60 * 1000 });
           });
         });
