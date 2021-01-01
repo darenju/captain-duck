@@ -46,7 +46,7 @@ function setup(client) {
         }));
       });
     } else {
-      const [_, mention, cupsToAdd] = content.match(/!cups\s(.*)\s(\d)+/) || [];
+      const [_, mention, cupsToAdd] = content.match(/!cups\s(.*)\s(-{0,1}\d)+/) || [];
       const nickname = getUserFromMention(mention, client).username;
 
       const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
