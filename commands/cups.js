@@ -52,7 +52,8 @@ function setup(client) {
       const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
 
       const reply = function() {
-        message.reply(`${cupsToAdd} coupe·s donnée·s à ${nickname} !`);
+        const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
+        message.reply(`${cupsToAdd} coupe·s ${verb} à ${nickname} !`);
       };
 
       req.get(nickname, function(err, row) {
