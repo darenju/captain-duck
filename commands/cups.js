@@ -2,11 +2,43 @@ const sqlite3 = require('sqlite3');
 const path = require('path');
 const { embed, getUserFromMention, db } = require('../utils');
 
+function giveCups(message, cupsToAdd, nickname, database) {
+  const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
+
+  const reply = function () {
+    const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
+    message.reply(`${Math.abs(cupsToAdd)} coupe·s ${verb} à ${nickname} !`);
+  };
+
+  req.get(nickname, function (err, row) {
+    if (!row) {
+      const add = database.prepare('INSERT INTO players (nickname, cups) VALUES (?, ?)');
+      add.run(nickname, parseInt(cupsToAdd, 10), function (err) {
+        if (!err) {
+          reply();
+        }
+        add.finalize();
+      });
+    } else {
+      const update = database.prepare('UPDATE players SET cups = ? WHERE nickname = ?');
+      const cups = parseInt(row.cups, 10);
+
+      update.run(cups + parseInt(cupsToAdd, 10), nickname, function (err) {
+        if (!err) {
+          reply();
+        }
+        update.finalize();
+      });
+    }
+  });
+  req.finalize();
+}
+
 function setup(client) {
   client.on('message', function(message) {
     const { author, content, mentions } = message;
 
-    if (author.bot || !content.startsWith('!cups')) {
+    if (author.bot || (!content.startsWith('!cups') && !content.startsWith('!givecup'))) {
       return;
     }
 
@@ -46,38 +78,25 @@ function setup(client) {
         }));
       });
     } else {
-      const [_, mention, cupsToAdd] = content.match(/!cups\s(.*)\s(-{0,1}\d)+/) || [];
-      const nickname = getUserFromMention(mention, client).username;
 
-      const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
+      let cupsToGive = 0;
+      let mentionToUse = null;
 
-      const reply = function() {
-        const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
-        message.reply(`${cupsToAdd} coupe·s ${verb} à ${nickname} !`);
-      };
+      if (content.startsWith('!cups')) {
+        const [_, mention, cupsToAdd] = content.match(/!cups\s(.*)\s(-{0,1}\d)+/) || [];
+        cupsToGive = cupsToAdd;
+        mentionToUse = mention;
+      } else if (content.startsWith('!givecup')) {
+        const [_, mention, cupsToAdd] = content.match(/!givecup\s(.*)+/) || [];
+        cupsToGive = 1;
+        mentionToUse = mention;
+      }
 
-      req.get(nickname, function(err, row) {
-        if (!row) {
-          const add = database.prepare('INSERT INTO players (nickname, cups) VALUES (?, ?)');
-          add.run(nickname, parseInt(cupsToAdd, 10), function(err) {
-            if (!err) {
-              reply();
-            }
-            add.finalize();
-          });
-        } else {
-          const update = database.prepare('UPDATE players SET cups = ? WHERE nickname = ?');
-          const cups = parseInt(row.cups, 10);
-
-          update.run(cups + parseInt(cupsToAdd, 10), nickname, function(err) {
-            if (!err) {
-              reply();
-            }
-            update.finalize();
-          });
-        }
-      });
-      req.finalize();
+      if (cupsToGive !== 0) {
+        const nickname = getUserFromMention(mentionToUse, client).username;
+        console.log(nickname, cupsToGive);
+        giveCups(message, cupsToGive, nickname, database);
+      }
     }
 
     database.close();
