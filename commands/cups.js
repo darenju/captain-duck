@@ -92,11 +92,11 @@ function setup(client) {
       let cupsToGive = 0;
       let mentionToUse = null;
 
-      if (content.startsWith('!cups')) {
+      if (content.startsWith('!cups ')) {
         const [_, mention, cupsToAdd] = content.match(/!cups\s(.*)\s(-{0,1}\d)+/) || [];
         cupsToGive = cupsToAdd;
         mentionToUse = mention;
-      } else if (content.startsWith('!givecup')) {
+      } else if (content.startsWith('!givecup ')) {
         const [_, mention, cupsToAdd] = content.match(/!givecup\s(.*)+/) || [];
         cupsToGive = 1;
         mentionToUse = mention;
