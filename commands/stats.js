@@ -1,7 +1,7 @@
 const axios = require('axios');
+const { PUBG_API_KEY } = require('../bot.json');
 const { embed, db, listen } = require('../utils');
 
-const API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxNzcxZDA3MC02MGQwLTAxMzgtMmI2MS0zOWFmMzcyZTk3NzMiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNTg2OTA0NTU1LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6ImRhcmVuanUtbGl2ZS1jIn0.uCJXiJd-KpA45AR9PJl0NTfytVmX0FVAkIAuJTAdYeA';
 const platform = 'steam';
 const url = `https://api.pubg.com/shards/steam/players`;
 
@@ -17,7 +17,7 @@ function reduce(perspective, key, stats) {
 }
 
 axios.defaults.headers.common = {
-  'Authorization': `Bearer ${API_KEY}`,
+  'Authorization': `Bearer ${PUBG_API_KEY}`,
   'Accept': 'application/vnd.api+json',
 };
 
