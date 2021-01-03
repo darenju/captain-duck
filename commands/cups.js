@@ -109,8 +109,8 @@ function setup(client) {
             title: 'Commande invalide : joueur introuvable'
           }));
         } else {
-          const { nickname } = user;
-          giveCups(message, cupsToGive, nickname, database);
+          const { username } = user;
+          giveCups(message, cupsToGive, username, database);
         }
       }
     }
