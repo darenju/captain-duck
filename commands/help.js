@@ -1,4 +1,4 @@
-const { listen } = require('../utils');
+const { embed, listen } = require('../utils');
 
 const helpText =
 `Il existe plusieurs commandes sur ce serveur :
@@ -25,12 +25,10 @@ function setup(client) {
     const { channel, content } = message;
 
     if (content === '!help') {
-      const embed = {
-        title: 'Manuel d’aide',
+      channel.send(embed({
+        title: ':information_source: Manuel d’aide :information_source:',
         description: helpText,
-      };
-
-      channel.send({ embed });
+      }));
     }
   });
 }
