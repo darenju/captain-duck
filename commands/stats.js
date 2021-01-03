@@ -149,7 +149,7 @@ function setup(client) {
       const fetch = database.prepare('SELECT pubg_id FROM players WHERE nickname = ?');
 
       fetch.get(username, function(err, row) {
-        if (!row) {
+        if (!row || !row.pubg_id) {
           message.reply(':warning: Impossible de te trouver dans la base de données… As-tu bien associé ton nom de joueur avec `!link [nomjoueur]` ?');
         } else {
           getStats(row.pubg_id)
