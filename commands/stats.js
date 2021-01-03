@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { embed, db } = require('../utils');
+const { embed, db, listen } = require('../utils');
 
 const API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxNzcxZDA3MC02MGQwLTAxMzgtMmI2MS0zOWFmMzcyZTk3NzMiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNTg2OTA0NTU1LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6ImRhcmVuanUtbGl2ZS1jIn0.uCJXiJd-KpA45AR9PJl0NTfytVmX0FVAkIAuJTAdYeA';
 const platform = 'steam';
@@ -110,7 +110,7 @@ function displayStats(allStats, mode, username, message) {
 }
 
 function setup(client) {
-  client.on('message', function(message) {
+  listen(client, function(message) {
     const { author: { username }, content } = message;
 
     if (content.startsWith('!link ')) {

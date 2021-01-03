@@ -26,8 +26,16 @@ function db() {
   return new sqlite3.Database(path.resolve(__dirname, 'database.db'));
 }
 
+function listen(client, cb) {
+  client.on('message', cb);
+  client.on('messageUpdate', function(oldMessage, newMessage) {
+    cb(newMessage);
+  });
+}
+
 module.exports = {
   embed,
   getUserFromMention,
   db,
+  listen,
 };

@@ -1,3 +1,5 @@
+const { listen } = require('../utils');
+
 const helpText =
 `Il existe plusieurs commandes sur ce serveur :
 
@@ -13,11 +15,13 @@ const helpText =
 
 :arrow_right: \`!cups [mention] [n]\` : Donne \`n\` coupe·s à l’utilisateur mentionné.
 
+:arrow_right: \`!givecup [mention]\` : Raccourci pour \`!cups [mention] 1\` ; donne une coupe à l’utilisateur mentionné.
+
 :arrow_right: \`!help\` : Affiche ce manuel d’aide.
 `;
 
 function setup(client) {
-  client.on('message', function(message) {
+  listen(client, function(message) {
     const { channel, content } = message;
 
     if (content === '!help') {

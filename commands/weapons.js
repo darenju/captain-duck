@@ -1,10 +1,10 @@
 const weapons = require('../weapons.json');
-const { embed } = require('../utils');
+const { embed, listen } = require('../utils');
 const { default: axios } = require('axios');
 const { parse } = require('node-html-parser');
 
 function setup(client) {
-  client.on('message', function(message) {
+  listen(client, function(message) {
     const { content } = message;
 
     if (content === '!weapons') {
@@ -18,7 +18,7 @@ function setup(client) {
 
       message.reply(embed({
         url: 'https://duckgame.fandom.com/wiki/Guns',
-        title: 'Liste des armes Duck Game',
+        title: ':gun: Liste des armes Duck Game :gun:',
         fields,
         footer: {
           text: 'Pour plus d’infos sur une arme, tapez `!gunstats [nomarme]`.',
@@ -27,7 +27,7 @@ function setup(client) {
     }
   });
 
-  client.on('message', function(message) {
+  listen(client, function(message) {
     const { content } = message;
 
     if (content.startsWith('!gunstats ')) {

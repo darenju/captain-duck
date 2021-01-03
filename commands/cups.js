@@ -1,13 +1,23 @@
 const sqlite3 = require('sqlite3');
 const path = require('path');
-const { embed, getUserFromMention, db } = require('../utils');
+const {
+  embed,
+  getUserFromMention,
+  db,
+  listen,
+} = require('../utils');
 
 function giveCups(message, cupsToAdd, nickname, database) {
   const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
 
   const reply = function () {
     const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
-    message.reply(`${Math.abs(cupsToAdd)} coupe·s ${verb} à ${nickname} !`);
+    const title = cupsToAdd > 0 ? 'Bravo' : 'Oups';
+
+    message.reply(embed({
+      title: `:trophy: ${title}, ${nickname} ! :trophy:`,
+      description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${nickname} !`,
+    }));
   };
 
   req.get(nickname, function (err, row) {
@@ -35,7 +45,7 @@ function giveCups(message, cupsToAdd, nickname, database) {
 }
 
 function setup(client) {
-  client.on('message', function(message) {
+  listen(client, function (message) {
     const { author, content, mentions } = message;
 
     if (author.bot || (!content.startsWith('!cups') && !content.startsWith('!givecup'))) {
@@ -48,7 +58,7 @@ function setup(client) {
       const fields = [];
 
       let index = 0;
-      database.each('SELECT * FROM players ORDER BY cups DESC', function(err, row) {
+      database.each('SELECT * FROM players ORDER BY cups DESC', function (err, row) {
         const cups = parseInt(row.cups, 10);
         let medal = cups === 0 ? ':medal:' : '';
 
@@ -71,7 +81,7 @@ function setup(client) {
         });
 
         index++;
-      }, function(err) {
+      }, function (err) {
         message.reply(embed({
           title: ':trophy: Classement Duck Game :trophy:',
           fields,
@@ -94,7 +104,6 @@ function setup(client) {
 
       if (cupsToGive !== 0) {
         const nickname = getUserFromMention(mentionToUse, client).username;
-        console.log(nickname, cupsToGive);
         giveCups(message, cupsToGive, nickname, database);
       }
     }

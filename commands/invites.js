@@ -1,8 +1,8 @@
 const config = require('../config.json');
-const { embed } = require('../utils');
+const { embed, listen } = require('../utils');
 
 function setup(client) {
-  client.on('message', function (message) {
+  listen(client, function (message) {
     const { channel, content, author } = message;
     const { name } = channel;
 
