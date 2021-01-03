@@ -20,6 +20,8 @@ function getUserFromMention(mention, client) {
 
     return client.users.cache.get(mention);
   }
+
+  return null;
 }
 
 function db() {

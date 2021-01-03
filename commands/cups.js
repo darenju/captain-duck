@@ -103,8 +103,15 @@ function setup(client) {
       }
 
       if (cupsToGive !== 0) {
-        const nickname = getUserFromMention(mentionToUse, client).username;
-        giveCups(message, cupsToGive, nickname, database);
+        const user = getUserFromMention(mentionToUse, client);
+        if (!user) {
+          message.reply(embed({
+            title: 'Commande invalide : joueur introuvable'
+          }));
+        } else {
+          const { nickname } = user;
+          giveCups(message, cupsToGive, nickname, database);
+        }
       }
     }
 
