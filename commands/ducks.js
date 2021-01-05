@@ -10,6 +10,9 @@ function setup(client) {
 
     if (requiresSuperDuck(message)) {
       const matches = content.match(/!newduck\s(<@!?\d+>)/);
+      if (!matches) {
+        return;
+      }
 
       if (matches[1]) {
         const user = getUserFromMention(matches[1], client);
