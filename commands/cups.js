@@ -87,7 +87,10 @@ function setup(client) {
           .then(function() {
             message.reply(embed({
               title: ':trophy: Classement Duck Game :trophy:',
-              description: `${author.username} a demandé le classement.`,
+              description: `${author.username} a demandé le classement.
+
+
+              `,
               fields,
             }));
           });
