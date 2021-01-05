@@ -83,10 +83,14 @@ function setup(client) {
 
         index++;
       }, function (err) {
-        message.reply(embed({
-          title: ':trophy: Classement Duck Game :trophy:',
-          fields,
-        }));
+        message.delete()
+          .then(function() {
+            message.reply(embed({
+              title: ':trophy: Classement Duck Game :trophy:',
+              description: `${author.username} a demandé le classement.`
+              fields,
+            }));
+          });
       });
     } else if(requiresSuperDuck(message)) {
       let cupsToGive = 0;
