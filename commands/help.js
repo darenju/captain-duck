@@ -11,6 +11,8 @@ const helpText =
 
 :arrow_right: \`!stats\` : Affiche les deux statistiques (FPP et TPP).
 
+:arrow_right: \`!newduck [mention]\` : Ajoute un nouveau joueur au classement Duck Game.
+
 :arrow_right: \`!cups\` : Affiche le classement Duck Game.
 
 :arrow_right: \`!cups [mention] [n]\` : Donne \`n\` coupe·s à l’utilisateur mentionné.
