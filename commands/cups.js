@@ -58,7 +58,7 @@ function setup(client) {
       const fields = [];
 
       let index = 0;
-      database.each('SELECT * FROM players ORDER BY cups DESC', function (err, row) {
+      database.each('SELECT * FROM players WHERE cups IS NOT NULL ORDER BY cups DESC', function (err, row) {
         const cups = parseInt(row.cups, 10);
         let medal = cups === 0 ? ':medal:' : '';
 
