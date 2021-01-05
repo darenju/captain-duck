@@ -88,6 +88,15 @@ function setup(client) {
         }));
       });
     } else {
+      const hasRole = message.member.roles.cache.find(r => r.name === 'Super Canard');
+
+      if (hasRole === undefined) {
+        message.reply(embed({
+          title: 'Erreur de permission !',
+          description: 'Tu ne peux pas utiliser cette commande car tu n’as pas le rôle Super Canard.',
+        }));
+        return;
+      }
 
       let cupsToGive = 0;
       let mentionToUse = null;
