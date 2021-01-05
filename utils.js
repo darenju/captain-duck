@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3');
 const path = require('path');
+const { SUPER_DUCK_ROLE_NAME } = require('./bot.json');
 
 function embed(options) {
   return {
@@ -11,17 +12,13 @@ function embed(options) {
 }
 
 function getUserFromMention(mention, client) {
-  if (mention.startsWith('<@') && mention.endsWith('>')) {
-    mention = mention.slice(2, -1);
+  const matches = mention.match(/^<@!?(\d+)>$/);
 
-    if (mention.startsWith('!')) {
-      mention = mention.slice(1);
-    }
+  if (!matches) return;
 
-    return client.users.cache.get(mention);
-  }
+  const id = matches[1];
 
-  return null;
+  return client.users.cache.get(id);
 }
 
 function db() {
@@ -35,9 +32,27 @@ function listen(client, cb) {
   });
 }
 
+function isSuperDuck(member) {
+  return member.roles.cache.find(r => r.name === SUPER_DUCK_ROLE_NAME) !== undefined;
+}
+
+function requiresSuperDuck(message) {
+  if (!isSuperDuck(message.member)) {
+    message.reply(embed({
+      title: 'Erreur de permission !',
+      description: 'Tu ne peux pas utiliser cette commande car tu n’as pas le rôle Super Canard.',
+    }));
+    return false;
+  }
+
+  return true;
+}
+
 module.exports = {
   embed,
   getUserFromMention,
   db,
   listen,
+  isSuperDuck,
+  requiresSuperDuck,
 };

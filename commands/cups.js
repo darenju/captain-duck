@@ -5,6 +5,7 @@ const {
   getUserFromMention,
   db,
   listen,
+  requiresSuperDuck,
 } = require('../utils');
 
 function giveCups(message, cupsToAdd, nickname, database) {
@@ -87,17 +88,7 @@ function setup(client) {
           fields,
         }));
       });
-    } else {
-      const hasRole = message.member.roles.cache.find(r => r.name === 'Super Canard');
-
-      if (hasRole === undefined) {
-        message.reply(embed({
-          title: 'Erreur de permission !',
-          description: 'Tu ne peux pas utiliser cette commande car tu n’as pas le rôle Super Canard.',
-        }));
-        return;
-      }
-
+    } else if(requiresSuperDuck(message)) {
       let cupsToGive = 0;
       let mentionToUse = null;
 
