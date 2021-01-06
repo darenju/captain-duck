@@ -19,7 +19,7 @@ function register(client) {
 
       channel.join()
         .then(function(connection) {
-          const dispatcher = connection.play(file);
+          const dispatcher = connection.play(file, { volume: 0.5 });
           setTimeout(function() {
             dispatcher.pause();
             channel.leave();
