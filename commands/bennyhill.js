@@ -19,6 +19,7 @@ function register(client) {
 
       channel.join()
         .then(function(connection) {
+          message.delete();
           const dispatcher = connection.play(file, { volume: BENNY_HILL_VOLUME });
           setTimeout(function() {
             dispatcher.pause();
