@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 const path = require('path');
-const { SUPER_DUCK_ROLE_NAME } = require('./bot.json');
+const { SUPER_DUCK_ROLE_NAME } = require('./config.json');
 
 function embed(options) {
   return {

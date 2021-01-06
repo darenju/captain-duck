@@ -6,6 +6,7 @@ const stats = require('./commands/stats');
 const weapons = require('./commands/weapons');
 const cups = require('./commands/cups');
 const ducks = require('./commands/ducks');
+const bennyhill = require('./commands/bennyhill');
 const help = require('./commands/help');
 
 const client = new Discord.Client();
@@ -25,6 +26,7 @@ client.on('ready', function() {
     ducks.register(client),
     weapons.register(client),
     stats.register(client),
+    bennyhill.register(client),
   ];
 
   invites.setup(client);
