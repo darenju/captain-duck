@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { PUBG_API_KEY } = require('../bot.json');
-const { embed, db, listen } = require('../utils');
+const { embed, db, registerCommand } = require('../utils');
 
 const platform = 'steam';
 const url = `https://api.pubg.com/shards/steam/players`;
@@ -109,73 +109,83 @@ function displayStats(allStats, mode, username, message) {
   }));
 }
 
-function setup(client) {
-  listen(client, function(message) {
-    const { author: { username }, content } = message;
+function register(client) {
+  return [
+    registerCommand(
+      client,
+      /^!link\s(.*)$/,
+      '!link [nomdujoueur]',
+      'Permet d’associer votre nom de joueur PUBG à votre compte Discord.',
+      function(message, regex) {
+        const { author: { username } } = message;
+        const matches = message.content.match(regex);
+        const nickname = matches[1].trim();
 
-    if (content.startsWith('!link ')) {
-      const nickname = content.replace('!link ', '').trim();
+        getPlayerId(nickname)
+          .then(function (playerId) {
+            if (playerId) {
+              const database = db();
+              const exists = database.prepare('SELECT pubg_id FROM players WHERE nickname = ?');
+              exists.get(username, function (err, row) {
+                let statement;
 
-      getPlayerId(nickname)
-        .then(function (playerId) {
-          if (playerId) {
-            const database = db();
-            const exists = database.prepare('SELECT pubg_id FROM players WHERE nickname = ?');
-            exists.get(username, function(err, row) {
-              let statement;
+                // Player exists, update.
+                if (row) {
+                  statement = database.prepare('UPDATE players SET pubg_id = ? WHERE nickname = ?');
+                } else {
+                  statement = database.prepare('INSERT INTO players (pubg_id, nickname, cups) VALUES (?, ?, 0)');
+                }
 
-              // Player exists, update.
-              if (row) {
-                statement = database.prepare('UPDATE players SET pubg_id = ? WHERE nickname = ?');
-              } else {
-                statement = database.prepare('INSERT INTO players (pubg_id, nickname, cups) VALUES (?, ?, 0)');
-              }
-
-              if (statement.run(playerId, username)) {
-                message.reply(':white_check_mark: Ton nom de joueur a bien été associé !');
-                exists.finalize(function() {
-                  statement.finalize(function (err) {
-                    database.close();
+                if (statement.run(playerId, username)) {
+                  message.reply(':white_check_mark: Ton nom de joueur a bien été associé !');
+                  exists.finalize(function () {
+                    statement.finalize(function (err) {
+                      database.close();
+                    });
                   });
-                });
-              }
-            });
-          } else {
-            message.reply(':warning: Oups… Impossible de trouver ce joueur… Erreur de frappe ?');
-          }
-        });
-    } else if (content.startsWith('!stats')) {
-      const database = db();
-      const fetch = database.prepare('SELECT pubg_id FROM players WHERE nickname = ?');
-
-      fetch.get(username, function(err, row) {
-        if (!row || !row.pubg_id) {
-          message.reply(':warning: Impossible de te trouver dans la base de données… As-tu bien associé ton nom de joueur avec `!link [nomjoueur]` ?');
-        } else {
-          getStats(row.pubg_id)
-            .then(function (stats) {
-              const perspectives = [];
-
-              if (content === '!stats') {
-                perspectives.push('fpp', 'tpp');
-              } else {
-                perspectives.push(content === '!statsfpp' ? 'fpp' : 'tpp');
-              }
-
-              perspectives.forEach(function (perspective) {
-                displayStats(stats, perspective, username, message);
+                }
               });
-            });
-        }
+            } else {
+              message.reply(':warning: Oups… Impossible de trouver ce joueur… Erreur de frappe ?');
+            }
+          });
+      }
+    ),
 
-        fetch.finalize(function(err) {
-          database.close();
+    registerCommand(
+      client,
+      /^!stats(fpp|tpp)?$/,
+      '!stats(tpp|fpp)',
+      'Une fois votre nom de joueur lié, récupère et affiche vos statistiques à vie en mode FPP, TPP, ou les deux.',
+      function(message, regex) {
+        const { author: { username } } = message;
+        const [_, perspective] = message.content.match(regex);
+        const perspectives = perspective ? [perspective] : ['fpp', 'tpp'];
+
+        const database = db();
+        const fetch = database.prepare('SELECT pubg_id FROM players WHERE nickname = ?');
+
+        fetch.get(username, function (err, row) {
+          if (!row || !row.pubg_id) {
+            message.reply(':warning: Impossible de te trouver dans la base de données… As-tu bien associé ton nom de joueur avec `!link [nomjoueur]` ?');
+          } else {
+            getStats(row.pubg_id)
+              .then(function (stats) {
+                perspectives.forEach(function (perspective) {
+                  displayStats(stats, perspective, username, message);
+                });
+              });
+          }
+
+          fetch.finalize(function (err) {
+            database.close();
+          });
         });
-      });
-    }
-  });
+      }
+    )
+  ];
 }
 
 module.exports = {
-  setup,
+  register,
 };

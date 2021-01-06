@@ -1,8 +1,9 @@
 {
   "CHANNEL_NAME": "duck-game",
   "BOT_MESSAGES": [
-    "version 1.0",
+    "version 1.2",
     "!help pour aide",
-    "Invitations Duck Game"
+    "Invitations Duck Game",
+    "Statistiques PUBG"
   ]
 }

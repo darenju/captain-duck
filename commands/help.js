@@ -1,8 +1,5 @@
-const { embed, listen } = require('../utils');
-
-const helpText =
-`Il existe plusieurs commandes sur ce serveur :
-
+const { embed, registerCommand } = require('../utils');
+/*
 :arrow_right: \`!link [nomdujoueur]\` : Permet d’associer votre nom de joueur PUBG à votre compte Discord.
 
 :arrow_right: \`!statsfpp\` : Une fois votre nom de joueur lié, récupère et affiche vos statistiques à vie en mode FPP.
@@ -19,22 +16,45 @@ const helpText =
 
 :arrow_right: \`!givecup [mention]\` : Raccourci pour \`!cups [mention] 1\` ; donne une coupe à l’utilisateur mentionné.
 
-:arrow_right: \`!help\` : Affiche ce manuel d’aide.
+
+`;
+ */
+function register(client, commands) {
+  registerCommand(
+    client,
+    /^!help$/,
+    '!help',
+    'Affiche ce manuel d’aide.',
+    function (message) {
+      let helpText = `Il existe plusieurs commandes sur ce serveur :
+
 `;
 
-function setup(client) {
-  listen(client, function(message) {
-    const { channel, content } = message;
+      commands.forEach(function(command) {
+        const name = Object.keys(command)[0];
+        const { needsSuperDuck } = command;
 
-    if (content === '!help') {
-      channel.send(embed({
+        helpText += `:arrow_right: \`${name}\` : ${command[name]}`;
+
+        if (needsSuperDuck) {
+          helpText += ` (*requiert le rôle Super Canard*)`;
+        }
+
+        helpText += `
+
+        `;
+      });
+
+      helpText += `:arrow_right: \`!help\` : Affiche ce manuel d’aide.`;
+
+      message.channel.send(embed({
         title: ':information_source: Manuel d’aide :information_source:',
         description: helpText,
       }));
     }
-  });
+  )
 }
 
 module.exports = {
-  setup,
+  register,
 };

@@ -19,11 +19,15 @@ client.on('ready', function() {
     message = ++message % messages;
     client.user.setActivity(BOT_MESSAGES[message], { type: 'PLAYING' });
   }, 10000);
+
+  const commands = [
+    cups.register(client),
+    ducks.register(client),
+    weapons.register(client),
+    stats.register(client),
+  ];
+
+  invites.setup(client);
+  help.register(client, commands.flat());
 });
 
-invites.setup(client);
-stats.setup(client);
-weapons.setup(client);
-cups.setup(client);
-ducks.setup(client);
-help.setup(client);
