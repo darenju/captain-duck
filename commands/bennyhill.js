@@ -1,5 +1,5 @@
 const { registerCommand } = require('../utils');
-const { BENNY_HILL_DURATION } = require('../config.json');
+const { BENNY_HILL_DURATION, BENNY_HILL_VOLUME } = require('../config.json');
 const path = require('path');
 
 const file = path.resolve(__dirname, '../bennyhill.mp3');
@@ -19,7 +19,7 @@ function register(client) {
 
       channel.join()
         .then(function(connection) {
-          const dispatcher = connection.play(file, { volume: 0.5 });
+          const dispatcher = connection.play(file, { volume: BENNY_HILL_VOLUME });
           setTimeout(function() {
             dispatcher.pause();
             channel.leave();
