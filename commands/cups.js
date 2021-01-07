@@ -28,7 +28,7 @@ function giveCups(message, cupsToAdd, user) {
 
     message.reply(embed({
       title: `:trophy: ${title}, ${username} ! :trophy:`,
-      description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${cups + cupsToAdd}.`,
+      description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${cupsBefore + cupsToAdd}.`,
       footer: {
         text: `${verb} par ${message.author.username}.`,
       },
