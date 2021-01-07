@@ -22,13 +22,13 @@ function giveCups(message, cupsToAdd, user) {
   const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
   const { username } = user;
 
-  const reply = function () {
+  const reply = function (cupsBefore) {
     const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
     const title = cupsToAdd > 0 ? 'Bravo' : 'Oups';
 
     message.reply(embed({
       title: `:trophy: ${title}, ${username} ! :trophy:`,
-      description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} !`,
+      description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${cups + cupsToAdd}.`,
       footer: {
         text: `${verb} par ${message.author.username}.`,
       },
@@ -40,7 +40,7 @@ function giveCups(message, cupsToAdd, user) {
       const add = database.prepare('INSERT INTO players (nickname, cups) VALUES (?, ?)');
       add.run(username, parseInt(cupsToAdd, 10), function (err) {
         if (!err) {
-          reply();
+          reply(0);
         }
         add.finalize();
       });
@@ -50,7 +50,7 @@ function giveCups(message, cupsToAdd, user) {
 
       update.run(cups + parseInt(cupsToAdd, 10), username, function (err) {
         if (!err) {
-          reply();
+          reply(cups);
         }
         update.finalize(function(err) {
           database.close();
