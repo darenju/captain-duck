@@ -75,7 +75,7 @@ function register(client) {
         let index = 0;
         database.each('SELECT * FROM players WHERE cups IS NOT NULL ORDER BY cups DESC', function (err, row) {
           const cups = parseInt(row.cups, 10);
-          let medal = cups === 0 ? ':medal:' : '';
+          let medal = ':medal:';
 
           if (index === 0 && cups > 0) {
             medal = ':first_place:';
