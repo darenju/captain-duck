@@ -13,13 +13,6 @@ function setup(client) {
     // If in invite channel…
     if (name === config.CHANNEL_NAME) {
       if (content.startsWith('steam://joinlobby/312530/')) {
-        const expire = new Date();
-        expire.setHours(expire.getHours() + 1);
-
-        const expireHour = expire.getHours();
-        const expireMinute = expire.getMinutes();
-        const expireTime = `${expireHour > 10 ? expireHour : '0' + expireHour}:${expireMinute > 10 ? expireMinute : '0' + expireMinute}`;
-
         message.delete().then(function () {
           channel.send(embed({
             title: `${author.username} vous invite à jouer à Duck Game`,
@@ -33,18 +26,11 @@ Clique-sur le lien ci-dessous si tu te sens prêt ! :muscle:
                 value: content,
                 inline: false,
               },
-              {
-                name: 'Expiration',
-                value: expireTime,
-                inline: true,
-              },
             ],
             footer: {
               text: 'N’oubliez pas le talc !',
             },
-          })).then(function (invitation) {
-            invitation.delete({ timeout: 60 * 60 * 1000 });
-          });
+          }));
         });
       }
     }

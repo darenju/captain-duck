@@ -7,6 +7,14 @@ const {
 } = require('../config.json');
 const path = require('path');
 
+const durations = {
+  'alibaba': ALI_BABA_DURATION,
+  'aladdin': ALADDIN_DURATION,
+  'benny': BENNY_HILL_DURATION,
+};
+
+const availableSounds = Object.keys(durations);
+
 function getFile(name) {
   return path.resolve(__dirname, `../sounds/${name}.mp3`);
 }
@@ -31,17 +39,18 @@ function playSound(message, file, duration) {
     });
 }
 
-const durations = {
-  'alibaba': ALI_BABA_DURATION,
-  'aladdin': ALADDIN_DURATION,
-  'benny': BENNY_HILL_DURATION,
-};
+function soundNotFound(message, sound) {
+  message.reply(`Le son “${sound}” n’existe pas ! Voici la liste des sons : ${availableSounds.join(', ')}`)
+    .then(function(sent) {
+      sent.delete({ timeout: 5000 });
+    });
+}
 
 function register(client) {
   return registerCommand(
     client,
-    /^!play\s(alibaba|aladdin|benny)$/,
-    `!play (${Object.keys(durations).join('|')})`,
+    /^!play\s([a-z]+)$/,
+    `!play (${availableSounds.join('|')})`,
     'Joue un son si vous êtes dans un channel vocal.',
     function(message, regex) {
       const [_, sound] = message.content.match(regex);
@@ -50,6 +59,8 @@ function register(client) {
 
       if (duration) {
         playSound(message, getFile(sound), duration);
+      } else {
+        soundNotFound(message, sound);
       }
     }
   );
