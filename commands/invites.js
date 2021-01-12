@@ -2,6 +2,8 @@ const { CHANNEL_NAME, INVITATION_TIMEOUT, PARTICIPATION_EMOJI } = require('../co
 const { embed, listen, db } = require('../utils');
 const moment = require('moment');
 
+const timeout = 1000 * 60 * INVITATION_TIMEOUT;
+
 function setup(client) {
   listen(client, function (message) {
     const { channel, content, author } = message;
@@ -21,14 +23,9 @@ function setup(client) {
             title: `${username} vous invite à jouer à Duck Game`,
             description: `${username} a créé une partie de Duck Game et vous invite à la rejoindre. :duck:
 
-Clique-sur le lien ci-dessous si tu te sens prêt ! :muscle:
+Valide ta participation en ajoutant la réaction ${PARTICIPATION_EMOJI} à ce message. Tu recevras ensuite le lien en message privé.
 `,
             fields: [
-              {
-                name: 'Le lien',
-                value: content,
-                inline: false,
-              },
               {
                 name: 'Expiration',
                 value: moment().add(INVITATION_TIMEOUT, 'minutes').format('HH:mm'),
@@ -36,15 +33,15 @@ Clique-sur le lien ci-dessous si tu te sens prêt ! :muscle:
               },
             ],
             footer: {
-              text: `Pense à valider ta participation en ajoutant la réaction ${PARTICIPATION_EMOJI} à ce message.`,
+              text: `N’oubliez pas le talc !`,
             },
           })).then(function(invitation) {
             invitation.react(PARTICIPATION_EMOJI);
-            invitation.delete({ timeout: 1000 * 60 * INVITATION_TIMEOUT });
+            invitation.delete({ timeout });
 
             const database = db();
-            const req = database.prepare('INSERT INTO duck_game_sessions (created_by, message_id) VALUES (?, ?)');
-            req.run(username, invitation.id, function(err) {
+            const req = database.prepare('INSERT INTO duck_game_sessions (created_by, message_id, link) VALUES (?, ?, ?)');
+            req.run(username, invitation.id, content, function(err) {
               req.finalize(function(err) {
                 database.close();
               });
@@ -65,10 +62,17 @@ Clique-sur le lien ci-dessous si tu te sens prêt ! :muscle:
     const nickname = user.username;
 
     const database = db();
-    const fetch = database.prepare('SELECT rowid FROM duck_game_sessions WHERE message_id = ?');
+    const fetch = database.prepare('SELECT rowid, link FROM duck_game_sessions WHERE message_id = ?');
     fetch.get(messageID, function(err, row) {
       if (row) {
         fetch.finalize();
+
+        user.send(`Salut, tu vas rejoindre une partie de Duck Game. Voici le lien : ${row.link}
+
+Bonne chance ! :muscle:`)
+          .then(function(messageSent) {
+            messageSent.delete({ timeout });
+          });
 
         const addParticipation = database.prepare('INSERT INTO duck_game_sessions_players (session, nickname) VALUES (?, ?)');
         addParticipation.run(row.rowid, nickname, function(err) {
