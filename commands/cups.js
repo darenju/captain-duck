@@ -38,6 +38,7 @@ function giveCups(message, cupsToAdd, user) {
         addRound.finalize();
       });
     });
+    getPlayers.finalize();
 
     const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
     const { username } = user;
