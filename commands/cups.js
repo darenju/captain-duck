@@ -40,46 +40,59 @@ function giveCups(message, cupsToAdd, user) {
     });
     getPlayers.finalize();
 
-    const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
     const { username } = user;
 
-    const reply = function (cupsBefore) {
-      const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
-      const title = cupsToAdd > 0 ? 'Bravo' : 'Oups';
+    const allowed = database.prepare('SELECT rowid FROM duck_game_sessions_players WHERE nickname = ? AND session = ?');
+    allowed.get(username, session.rowid, function(err, isAllowed) {
+      allowed.finalize();
 
-      message.reply(embed({
-        title: `:trophy: ${title}, ${username} ! :trophy:`,
-        description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${parseInt(cupsBefore, 10) + parseInt(cupsToAdd, 10)}.`,
-        footer: {
-          text: `${verb} par ${message.author.username}.`,
-        },
-      }));
-    };
-
-    req.get(username, function (err, row) {
-      if (!row) {
-        const add = database.prepare('INSERT INTO players (nickname, cups) VALUES (?, ?)');
-        add.run(username, parseInt(cupsToAdd, 10), function (err) {
-          if (!err) {
-            reply(0);
-          }
-          add.finalize();
-        });
-      } else {
-        const update = database.prepare('UPDATE players SET cups = ? WHERE nickname = ?');
-        const cups = parseInt(row.cups, 10);
-
-        update.run(cups + parseInt(cupsToAdd, 10), username, function (err) {
-          if (!err) {
-            reply(cups);
-          }
-          update.finalize(function (err) {
-            database.close();
-          });
-        });
+      if (!isAllowed) {
+        message.reply(embed({
+          title: `Impossible de donner une coupe à ${username} car il ne fait pas partie de la session !`,
+        }));
+        return;
       }
+
+      const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
+
+      const reply = function (cupsBefore) {
+        const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
+        const title = cupsToAdd > 0 ? 'Bravo' : 'Oups';
+
+        message.reply(embed({
+          title: `:trophy: ${title}, ${username} ! :trophy:`,
+          description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${parseInt(cupsBefore, 10) + parseInt(cupsToAdd, 10)}.`,
+          footer: {
+            text: `${verb} par ${message.author.username}.`,
+          },
+        }));
+      };
+
+      req.get(username, function (err, row) {
+        if (!row) {
+          const add = database.prepare('INSERT INTO players (nickname, cups) VALUES (?, ?)');
+          add.run(username, parseInt(cupsToAdd, 10), function (err) {
+            if (!err) {
+              reply(0);
+            }
+            add.finalize();
+          });
+        } else {
+          const update = database.prepare('UPDATE players SET cups = ? WHERE nickname = ?');
+          const cups = parseInt(row.cups, 10);
+
+          update.run(cups + parseInt(cupsToAdd, 10), username, function (err) {
+            if (!err) {
+              reply(cups);
+            }
+            update.finalize(function (err) {
+              database.close();
+            });
+          });
+        }
+      });
+      req.finalize();
     });
-    req.finalize();
   });
 }
 
