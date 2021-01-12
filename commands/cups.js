@@ -53,7 +53,14 @@ function giveCups(message, cupsToAdd, user) {
           reply(cups);
         }
         update.finalize(function(err) {
-          database.close();
+          database.each('SELECT nickname FROM duck_game_sessions_players WHERE session = (SELECT rowid FROM duck_game_sessions ORDER BY rowid DESC LIMIT 1)', function(err, row) {
+            const addRound = database.prepare('UPDATE players SET duck_game_rounds = duck_game_rounds + 1 WHERE nickname = ?');
+            addRound.run(row.nickname, function() {
+              addRound.finalize(function() {
+                database.close();
+              });
+            });
+          });
         });
       });
     }

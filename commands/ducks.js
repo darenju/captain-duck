@@ -29,7 +29,7 @@ function register(client) {
             const exists = database.prepare('SELECT rowid FROM players WHERE nickname = ?');
             exists.get(username, function (err, row) {
               if (!row) {
-                const req = database.prepare('INSERT INTO players(nickname, cups) VALUES (?, 0)');
+                const req = database.prepare('INSERT INTO players(nickname, cups, duck_game_rounds) VALUES (?, 0, 0)');
                 req.run(username, function (err) {
                   if (!err) {
                     message.reply(embed({
