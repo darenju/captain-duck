@@ -22,11 +22,14 @@ const { embed, registerCommand } = require('../utils');
 function register(client, commands) {
   registerCommand(
     client,
-    /^!help$/,
+    /^(?:!|\/)help$/,
     '!help',
     'Affiche ce manuel d’aide.',
     function (message) {
-      let helpText = `Il existe plusieurs commandes sur ce serveur :
+      let helpText = `Il existe plusieurs commandes sur ce serveur.
+
+Les préfixes de commande autorisés sont \`!\` et \`/\`.
+
 
 `;
 

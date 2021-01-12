@@ -49,7 +49,7 @@ function soundNotFound(message, sound) {
 function register(client) {
   return registerCommand(
     client,
-    /^!play\s([a-z]+)$/,
+    /^(?:!|\/)play\s([a-z]+)$/,
     `!play (${availableSounds.join('|')})`,
     'Joue un son si vous êtes dans un channel vocal.',
     function(message, regex) {

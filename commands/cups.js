@@ -65,7 +65,7 @@ function register(client) {
   return [
     registerCommand(
       client,
-      /^!cups$/,
+      /^(?:!|\/)cups$/,
       '!cups',
       'Affiche le classement Duck Game.',
       function(message) {
@@ -112,7 +112,7 @@ function register(client) {
 
     registerCommand(
       client,
-      /^!givecup\s(<@!?\d+>)\s?(-{0,1}\d+)?$/,
+      /^(?:!|\/)givecup\s(<@!?\d+>)\s?(-{0,1}\d+)?$/,
       '!givecup [mention] [n=1]',
       'Donne \`n\` coupe·s à l’utilisateur mentionné. Si pas de \`n\` précisé, donne une seule coupe.',
       function(message, regex) {

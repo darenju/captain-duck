@@ -3,7 +3,7 @@ const { db, registerCommand, requiresSuperDuck, getUserFromMention, embed } = re
 function register(client) {
   return registerCommand(
     client,
-    /!newduck\s(<@!?\d+>)/,
+    /(?:!|\/)newduck\s(<@!?\d+>)/,
     '!newduck [mention]',
     'Ajoute un nouveau joueur au classement Duck Game.',
     function (message) {

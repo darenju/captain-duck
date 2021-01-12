@@ -113,7 +113,7 @@ function register(client) {
   return [
     registerCommand(
       client,
-      /^!link\s(.*)$/,
+      /^(?:!|\/)link\s(.*)$/,
       '!link [nomdujoueur]',
       'Permet d’associer votre nom de joueur PUBG à votre compte Discord.',
       function(message, regex) {
@@ -154,7 +154,7 @@ function register(client) {
 
     registerCommand(
       client,
-      /^!stats(fpp|tpp)?$/,
+      /^(?:!|\/)stats(fpp|tpp)?$/,
       '!stats(tpp|fpp)',
       'Une fois votre nom de joueur lié, récupère et affiche vos statistiques à vie en mode FPP, TPP, ou les deux.',
       function(message, regex) {

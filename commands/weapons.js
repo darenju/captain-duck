@@ -7,7 +7,7 @@ function register(client) {
   return [
     registerCommand(
       client,
-      /^!weapons$/,
+      /^(?:!|\/)weapons$/,
       '!weapons',
       'Affiche la liste des armes Duck Game.',
       function(message) {
@@ -32,7 +32,7 @@ function register(client) {
 
     registerCommand(
       client,
-      /^!gunstats\s(.*)$/,
+      /^(?:!|\/)gunstats\s(.*)$/,
       '!gunstats [nomarme]',
       'Affiche les statistiques disponibles pour une arme.',
       function(message, regex) {
