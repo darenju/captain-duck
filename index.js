@@ -6,10 +6,12 @@ const stats = require('./commands/stats');
 const weapons = require('./commands/weapons');
 const cups = require('./commands/cups');
 const ducks = require('./commands/ducks');
+const sessions = require('./commands/sessions');
 const sounds = require('./commands/sounds');
 const help = require('./commands/help');
 
 const client = new Discord.Client();
+client.setMaxListeners(0);
 client.login(BOT_TOKEN);
 client.on('ready', function() {
   let message = 0;
@@ -24,6 +26,7 @@ client.on('ready', function() {
   const commands = [
     cups.register(client),
     ducks.register(client),
+    sessions.register(client),
     weapons.register(client),
     stats.register(client),
     sounds.register(client),

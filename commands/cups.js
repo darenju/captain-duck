@@ -19,53 +19,66 @@ function giveCups(message, cupsToAdd, user) {
   }
 
   const database = db();
-  const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
-  const { username } = user;
 
-  const reply = function (cupsBefore) {
-    const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
-    const title = cupsToAdd > 0 ? 'Bravo' : 'Oups';
-
-    message.reply(embed({
-      title: `:trophy: ${title}, ${username} ! :trophy:`,
-      description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${parseInt(cupsBefore, 10) + parseInt(cupsToAdd, 10)}.`,
-      footer: {
-        text: `${verb} par ${message.author.username}.`,
-      },
-    }));
-  };
-
-  req.get(username, function (err, row) {
+  database.get('SELECT rowid FROM duck_game_sessions WHERE complete = FALSE', function(err, row) {
     if (!row) {
-      const add = database.prepare('INSERT INTO players (nickname, cups) VALUES (?, ?)');
-      add.run(username, parseInt(cupsToAdd, 10), function (err) {
-        if (!err) {
-          reply(0);
-        }
-        add.finalize();
-      });
-    } else {
-      const update = database.prepare('UPDATE players SET cups = ? WHERE nickname = ?');
-      const cups = parseInt(row.cups, 10);
+      message.reply('Impossible de donner une coupe : pas de session de jeu en cours !');
+      return;
+    }
 
-      update.run(cups + parseInt(cupsToAdd, 10), username, function (err) {
-        if (!err) {
-          reply(cups);
-        }
-        update.finalize(function(err) {
-          database.each('SELECT nickname FROM duck_game_sessions_players WHERE session = (SELECT rowid FROM duck_game_sessions ORDER BY rowid DESC LIMIT 1)', function(err, row) {
-            const addRound = database.prepare('UPDATE players SET duck_game_rounds = duck_game_rounds + 1 WHERE nickname = ?');
-            addRound.run(row.nickname, function() {
-              addRound.finalize(function() {
-                database.close();
+    const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
+    const { username } = user;
+
+    const reply = function (cupsBefore) {
+      const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
+      const title = cupsToAdd > 0 ? 'Bravo' : 'Oups';
+
+      message.reply(embed({
+        title: `:trophy: ${title}, ${username} ! :trophy:`,
+        description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${parseInt(cupsBefore, 10) + parseInt(cupsToAdd, 10)}.`,
+        footer: {
+          text: `${verb} par ${message.author.username}.`,
+        },
+      }));
+    };
+
+    req.get(username, function (err, row) {
+      if (!row) {
+        const add = database.prepare('INSERT INTO players (nickname, cups) VALUES (?, ?)');
+        add.run(username, parseInt(cupsToAdd, 10), function (err) {
+          if (!err) {
+            reply(0);
+          }
+          add.finalize();
+        });
+      } else {
+        const update = database.prepare('UPDATE players SET cups = ? WHERE nickname = ?');
+        const cups = parseInt(row.cups, 10);
+
+        update.run(cups + parseInt(cupsToAdd, 10), username, function (err) {
+          if (!err) {
+            reply(cups);
+          }
+          update.finalize(function (err) {
+            database.each('SELECT nickname, session FROM duck_game_sessions_players WHERE session = (SELECT rowid FROM duck_game_sessions ORDER BY rowid DESC LIMIT 1)', function (err, row) {
+              const addRound = database.prepare('UPDATE players SET duck_game_rounds = duck_game_rounds + 1 WHERE nickname = ?');
+              addRound.run(row.nickname, function () {
+                addRound.finalize(function () {
+                  const addRoundToSession = database.prepare('UPDATE duck_game_sessions SET rounds = rounds + 1 WHERE rowid = ?');
+                  addRoundToSession.run(row.session, function(err) {
+                    addRoundToSession.finalize(function() {
+                      database.close();
+                    });
+                  });
+                });
               });
             });
           });
         });
-      });
-    }
+      }
+    });
+    req.finalize();
   });
-  req.finalize();
 }
 
 function register(client) {
