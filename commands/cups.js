@@ -20,11 +20,24 @@ function giveCups(message, cupsToAdd, user) {
 
   const database = db();
 
-  database.get('SELECT rowid FROM duck_game_sessions WHERE complete = FALSE', function(err, row) {
-    if (!row) {
+  database.get('SELECT rowid FROM duck_game_sessions WHERE complete = FALSE', function(err, session) {
+    if (!session) {
       message.reply('Impossible de donner une coupe : pas de session de jeu en cours !');
       return;
     }
+
+    const addRoundToSession = database.prepare('UPDATE duck_game_sessions SET rounds = rounds + 1 WHERE rowid = ?');
+    addRoundToSession.run(session.rowid, function (err) {
+      addRoundToSession.finalize();
+    });
+
+    const getPlayers = database.prepare('SELECT nickname, session FROM duck_game_sessions_players WHERE session = ?');
+    getPlayers.each(session.rowid, function (err, row) {
+      const addRound = database.prepare('UPDATE players SET duck_game_rounds = duck_game_rounds + 1 WHERE nickname = ?');
+      addRound.run(row.nickname, function () {
+        addRound.finalize();
+      });
+    });
 
     const req = database.prepare('SELECT cups FROM players WHERE nickname = ?');
     const { username } = user;
@@ -60,19 +73,7 @@ function giveCups(message, cupsToAdd, user) {
             reply(cups);
           }
           update.finalize(function (err) {
-            database.each('SELECT nickname, session FROM duck_game_sessions_players WHERE session = (SELECT rowid FROM duck_game_sessions ORDER BY rowid DESC LIMIT 1)', function (err, row) {
-              const addRound = database.prepare('UPDATE players SET duck_game_rounds = duck_game_rounds + 1 WHERE nickname = ?');
-              addRound.run(row.nickname, function () {
-                addRound.finalize(function () {
-                  const addRoundToSession = database.prepare('UPDATE duck_game_sessions SET rounds = rounds + 1 WHERE rowid = ?');
-                  addRoundToSession.run(row.session, function(err) {
-                    addRoundToSession.finalize(function() {
-                      database.close();
-                    });
-                  });
-                });
-              });
-            });
+            database.close();
           });
         });
       }
