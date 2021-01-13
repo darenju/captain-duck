@@ -1,5 +1,6 @@
 const { Message } = require('discord.js');
 const { registerCommand, db, embed } = require('../utils');
+const moment = require('moment');
 
 function register(client) {
   return [
@@ -29,6 +30,45 @@ function register(client) {
         });
       }
     ),
+
+    registerCommand(
+      client,
+      /^(?:!|\/)sessions$/,
+      '!sessions',
+      'Affiche le résumé des sessions de jeu.',
+      function(message) {
+        const database = db();
+        const fields = [];
+        database.each('SELECT session.rowid, COUNT(players.rowid) AS players, session.* FROM duck_game_sessions session, duck_game_sessions_players players WHERE players.session = session.rowid AND session.complete = TRUE', function(err, row) {
+          if (!row.created_by) {
+            return;
+          }
+
+          fields.push({
+            name: `:video_game: Session de ${row.created_by}`,
+            value: `
+:date: **Créée à** : ${moment(row.created_at).format('DD/MM à HH:mm')}
+:white_check_mark: **Finie à** : ${moment(row.finished_at).format('DD/MM à HH:mm')}
+:trophy: **Rounds** : ${row.rounds}
+:duck: **Joueurs** : ${row.players}`,
+            inline: false,
+          });
+        }, function(err, count) {
+          message.delete()
+            .then(function() {
+              message.channel.send(embed({
+                title: 'Sessions de Duck Game',
+                description: `${message.author.username} a demandé les sessions.`,
+                fields,
+                footer: {
+                  text: `Affichage de ${count} sessions terminé.`
+                },
+              }));
+            })
+          database.close();
+        });
+      }
+    )
   ];
 }
 
