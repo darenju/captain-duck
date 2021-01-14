@@ -4,6 +4,15 @@ const moment = require('moment');
 
 const timeout = 1000 * 60 * INVITATION_TIMEOUT;
 
+function addParticipation(database, session, nickname, cb) {
+  const req = database.prepare('INSERT INTO duck_game_sessions_players (session, nickname) VALUES (?, ?)');
+  req.run(session, nickname, function (err) {
+    req.finalize(function () {
+      database.close();
+    });
+  });
+}
+
 function setup(client) {
   listen(client, function (message) {
     const { channel, content, author } = message;
@@ -42,8 +51,10 @@ Valide ta participation en ajoutant la réaction ${PARTICIPATION_EMOJI} à ce me
             const database = db();
             const req = database.prepare('INSERT INTO duck_game_sessions (created_by, message_id, link) VALUES (?, ?, ?)');
             req.run(username, invitation.id, content, function(err) {
-              req.finalize(function(err) {
-                database.close();
+              req.finalize();
+
+              database.get('SELECT last_insert_rowid() AS session', function(err2, data) {
+                addParticipation(database, data.session, username);
               });
             });
           });
@@ -62,29 +73,24 @@ Valide ta participation en ajoutant la réaction ${PARTICIPATION_EMOJI} à ce me
     const nickname = user.username;
 
     const database = db();
-    const fetch = database.prepare('SELECT rowid, link FROM duck_game_sessions WHERE message_id = ?');
-    fetch.get(messageID, function(err, row) {
-      if (row) {
+    const fetch = database.prepare('SELECT rowid AS id, link FROM duck_game_sessions WHERE message_id = ?');
+    fetch.get(messageID, function(err, session) {
+      if (session) {
         fetch.finalize();
 
         const alreadyPlaying = database.prepare('SELECT rowid FROM duck_game_sessions_players WHERE session = ? AND nickname = ?');
-        alreadyPlaying.get(row.rowid, nickname, function(err, playingSession) {
+        alreadyPlaying.get(session.id, nickname, function(err, playingInSession) {
           alreadyPlaying.finalize();
 
-          if (!playingSession) {
+          if (!playingInSession) {
+            addParticipation(database, session.id, nickname);
+
             user.send(`Salut, tu vas rejoindre une partie de Duck Game. Voici le lien : ${row.link}
 
 Bonne chance ! :muscle:`)
               .then(function (messageSent) {
                 messageSent.delete({ timeout });
               });
-
-            const addParticipation = database.prepare('INSERT INTO duck_game_sessions_players (session, nickname) VALUES (?, ?)');
-            addParticipation.run(row.rowid, nickname, function (err) {
-              addParticipation.finalize(function () {
-                database.close();
-              });
-            });
           }
         });
       } else {
