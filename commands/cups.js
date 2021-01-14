@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3');
 const path = require('path');
+const { CHANNEL_NAME } = require('../config.json');
 const {
   embed,
   getUserFromMention,
@@ -104,6 +105,10 @@ function register(client) {
       '!cups',
       'Affiche le classement Duck Game.',
       function(message) {
+        if (message.channel.name !== CHANNEL_NAME) {
+          return;
+        }
+
         const database = db();
         const fields = [];
 
@@ -152,6 +157,10 @@ function register(client) {
       '!givecup [mention] [n=1]',
       'Donne \`n\` coupe·s à l’utilisateur mentionné. Si pas de \`n\` précisé, donne une seule coupe.',
       function(message, regex) {
+        if (message.channel.name !== CHANNEL_NAME) {
+          return;
+        }
+
         const [_, mention, cups] = message.content.match(regex);
         let cupsToGive = cups || '1';
 

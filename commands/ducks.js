@@ -1,3 +1,4 @@
+const { CHANNEL_NAME } = require('../config.json');
 const { db, registerCommand, requiresSuperDuck, getUserFromMention, embed } = require('../utils');
 
 function register(client) {
@@ -13,7 +14,7 @@ function register(client) {
         return;
       }
 
-      if (requiresSuperDuck(message)) {
+      if (requiresSuperDuck(message) && message.channel.name === CHANNEL_NAME) {
         const matches = content.match(/!newduck\s(<@!?\d+>)/);
         if (!matches) {
           return;

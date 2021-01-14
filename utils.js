@@ -49,17 +49,14 @@ function requiresSuperDuck(message) {
 }
 
 function registerCommand(client, regex, example, usage, cb, superDuckRequired) {
-  listen(client, function(message) {
-    if (regex.test(message.content) && !message.author.bot) {
-      if (superDuckRequired === true && requiresSuperDuck(message)) {
-        cb(message, regex);
-      } else {
-        cb(message, regex);
-      }
+  return {
+    [example]: {
+      regex,
+      usage,
+      superDuckRequired,
+      cb
     }
-  });
-
-  return { [example]: usage, needsSuperDuck: superDuckRequired };
+  };
 }
 
 module.exports = {

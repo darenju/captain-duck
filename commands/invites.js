@@ -67,18 +67,25 @@ Valide ta participation en ajoutant la réaction ${PARTICIPATION_EMOJI} à ce me
       if (row) {
         fetch.finalize();
 
-        user.send(`Salut, tu vas rejoindre une partie de Duck Game. Voici le lien : ${row.link}
+        const alreadyPlaying = database.prepare('SELECT rowid FROM duck_game_sessions_players WHERE session = ? AND nickname = ?');
+        alreadyPlaying.get(row.rowid, nickname, function(err, playingSession) {
+          alreadyPlaying.finalize();
+
+          if (!playingSession) {
+            user.send(`Salut, tu vas rejoindre une partie de Duck Game. Voici le lien : ${row.link}
 
 Bonne chance ! :muscle:`)
-          .then(function(messageSent) {
-            messageSent.delete({ timeout });
-          });
+              .then(function (messageSent) {
+                messageSent.delete({ timeout });
+              });
 
-        const addParticipation = database.prepare('INSERT INTO duck_game_sessions_players (session, nickname) VALUES (?, ?)');
-        addParticipation.run(row.rowid, nickname, function(err) {
-          addParticipation.finalize(function() {
-            database.close();
-          });
+            const addParticipation = database.prepare('INSERT INTO duck_game_sessions_players (session, nickname) VALUES (?, ?)');
+            addParticipation.run(row.rowid, nickname, function (err) {
+              addParticipation.finalize(function () {
+                database.close();
+              });
+            });
+          }
         });
       } else {
         message.channel.send('Impossible de trouver cette session de jeu !');

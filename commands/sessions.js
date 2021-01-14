@@ -1,4 +1,5 @@
 const { Message } = require('discord.js');
+const { CHANNEL_NAME } = require('../config.json');
 const { registerCommand, db, embed } = require('../utils');
 const moment = require('moment');
 
@@ -10,6 +11,10 @@ function register(client) {
       '!endsession',
       'Termine la session de jeu Duck Game en cours.',
       function(message) {
+        if (message.channel.name !== CHANNEL_NAME) {
+          return;
+        }
+
         const database = db();
         database.get('SELECT rowid, created_by, rounds FROM duck_game_sessions WHERE complete = FALSE', function(err, row) {
           if (!row) {
@@ -37,6 +42,10 @@ function register(client) {
       '!sessions',
       'Affiche le résumé des sessions de jeu.',
       function(message) {
+        if (message.channel.name !== CHANNEL_NAME) {
+          return;
+        }
+
         const database = db();
         const fields = [];
         database.each('SELECT session.rowid, COUNT(players.rowid) AS players, session.* FROM duck_game_sessions session, duck_game_sessions_players players WHERE players.session = session.rowid AND session.complete = TRUE', function(err, row) {
