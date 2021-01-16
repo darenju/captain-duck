@@ -85,7 +85,7 @@ Valide ta participation en ajoutant la réaction ${PARTICIPATION_EMOJI} à ce me
           if (!playingInSession) {
             addParticipation(database, session.id, nickname);
 
-            user.send(`Salut, tu vas rejoindre une partie de Duck Game. Voici le lien : ${row.link}
+            user.send(`Salut, tu vas rejoindre une partie de Duck Game. Voici le lien : ${session.link}
 
 Bonne chance ! :muscle:`)
               .then(function (messageSent) {
