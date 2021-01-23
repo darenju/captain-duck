@@ -22,7 +22,7 @@ function register(client) {
             return;
           }
 
-          const terminate = database.prepare('UPDATE duck_game_sessions SET complete = TRUE WHERE rowid = ?');
+          const terminate = database.prepare('UPDATE duck_game_sessions SET complete = TRUE, finished_at = (datetime(\'now\', \'localtime\')) WHERE rowid = ?');
           terminate.run(row.rowid, function(err) {
             message.reply(embed({
               title: `Session de jeu terminée par ${row.created_by} ! Il y a eu ${row.rounds} rounds.`
