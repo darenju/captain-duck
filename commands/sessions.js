@@ -1,9 +1,25 @@
 const { Message } = require('discord.js');
+const { DUCK_GAME_VOICE_CHANNEL } = require('../bot.json');
 const { CHANNEL_NAME } = require('../config.json');
 const { registerCommand, db, embed } = require('../utils');
 const moment = require('moment');
 
 function register(client) {
+  client.on('voiceStateUpdate', function (oldState, newState) {
+    if (oldState.channel && oldState.channel.id === DUCK_GAME_VOICE_CHANNEL) {
+      if (!newState.member.voice.channel) {
+        // Update to remove presence of User of user in session.
+        const database = db();
+        const update = database.prepare('UPDATE duck_game_sessions_players SET present = FALSE where nickname = ?');
+        update.run(newState.member.user.username, function(err) {
+          update.finalize(function() {
+            database.close();
+          });
+        });
+      }
+    }
+  });
+
   return [
     registerCommand(
       client,

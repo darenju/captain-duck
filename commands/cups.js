@@ -32,7 +32,7 @@ function giveCups(message, cupsToAdd, user) {
       addRoundToSession.finalize();
     });
 
-    const getPlayers = database.prepare('SELECT nickname, session FROM duck_game_sessions_players WHERE session = ?');
+    const getPlayers = database.prepare('SELECT nickname, session FROM duck_game_sessions_players WHERE session = ? AND present IS TRUE');
     getPlayers.each(session.rowid, function (err, row) {
       const addRound = database.prepare('UPDATE players SET duck_game_rounds = duck_game_rounds + 1 WHERE nickname = ?');
       addRound.run(row.nickname, function () {
@@ -43,7 +43,7 @@ function giveCups(message, cupsToAdd, user) {
 
     const { username } = user;
 
-    const allowed = database.prepare('SELECT rowid FROM duck_game_sessions_players WHERE nickname = ? AND session = ?');
+    const allowed = database.prepare('SELECT rowid FROM duck_game_sessions_players WHERE nickname = ? AND session = ? AND present IS TRUE');
     allowed.get(username, session.rowid, function(err, isAllowed) {
       allowed.finalize();
 
