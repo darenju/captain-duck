@@ -60,13 +60,16 @@ function giveCups(message, cupsToAdd, user) {
         const verb = cupsToAdd > 0 ? 'donnée·s' : 'retirée·s';
         const title = cupsToAdd > 0 ? 'Bravo' : 'Oups';
 
-        message.reply(embed({
-          title: `:trophy: ${title}, ${username} ! :trophy:`,
-          description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${parseInt(cupsBefore, 10) + parseInt(cupsToAdd, 10)}.`,
-          footer: {
-            text: `${verb} par ${message.author.username}.`,
-          },
-        }));
+        message.delete()
+          .then(function() {
+            message.channel.send(embed({
+              title: `:trophy: ${title}, ${username} ! :trophy:`,
+              description: `${Math.abs(cupsToAdd)} coupe·s ${verb} à ${username} ! Il en a maintenant ${parseInt(cupsBefore, 10) + parseInt(cupsToAdd, 10)}.`,
+              footer: {
+                text: `${verb} par ${message.author.username}.`,
+              },
+            }));
+          });
       };
 
       req.get(username, function (err, row) {
@@ -81,13 +84,21 @@ function giveCups(message, cupsToAdd, user) {
         } else {
           const update = database.prepare('UPDATE players SET cups = ? WHERE nickname = ?');
           const cups = parseInt(row.cups, 10);
+          const finalCups = cups + parseInt(cupsToAdd, 10);
 
-          update.run(cups + parseInt(cupsToAdd, 10), username, function (err) {
+          update.run(finalCups, username, function (err) {
             if (!err) {
               reply(cups);
             }
             update.finalize(function (err) {
-              database.close();
+              const updateSession = database.prepare('UPDATE duck_game_sessions_players SET cups = cups + ? WHERE session = ? AND nickname = ?');
+              updateSession.run(cupsToAdd, session.rowid, username, function(err) {
+                if (!err) {
+                  updateSession.finalize(function() {
+                    database.close();
+                  });
+                }
+              });
             });
           });
         }

@@ -32,20 +32,46 @@ function register(client) {
         }
 
         const database = db();
-        database.get('SELECT rowid, created_by, rounds FROM duck_game_sessions WHERE complete = FALSE', function(err, row) {
-          if (!row) {
+        database.get('SELECT rowid, created_by, rounds FROM duck_game_sessions WHERE complete = FALSE', function(err, session) {
+          if (!session) {
             message.reply('Pas de session de jeu à terminer.');
             return;
           }
 
           const terminate = database.prepare('UPDATE duck_game_sessions SET complete = TRUE, finished_at = (datetime(\'now\', \'localtime\')) WHERE rowid = ?');
-          terminate.run(row.rowid, function(err) {
-            message.reply(embed({
-              title: `Session de jeu terminée par ${row.created_by} ! Il y a eu ${row.rounds} rounds.`
-            }));
+          terminate.run(session.rowid, function(err) {
+            const players = database.prepare('SELECT nickname, cups FROM duck_game_sessions_players WHERE session = ?');
 
-            terminate.finalize(function() {
-              database.close();
+            const fields = [];
+
+            players.each(session.rowid, function(err, player) {
+              fields.push({
+                name: player.nickname,
+                value: `**${player.cups}** :trophy:`,
+                inline: false,
+              });
+            }, function() {
+              players.finalize();
+
+              message.delete()
+                .then(function() {
+                  message.channel.send(embed({
+                    title: `Session de jeu de ${session.created_by} terminée !`,
+                    description: `
+    Il y a eu ${session.rounds} rounds.
+    Voici le récapitulatif des coupes gagnées par les joueurs participants :
+
+    `,
+                    fields,
+                    footer: {
+                      text: `Session terminée par ${message.author.username}.`,
+                    },
+                  }));
+                });
+
+              terminate.finalize(function () {
+                database.close();
+              });
             });
           });
         });
