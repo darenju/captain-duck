@@ -40,7 +40,7 @@ function register(client) {
 
           const terminate = database.prepare('UPDATE duck_game_sessions SET complete = TRUE, finished_at = (datetime(\'now\', \'localtime\')) WHERE rowid = ?');
           terminate.run(session.rowid, function(err) {
-            const players = database.prepare('SELECT nickname, cups FROM duck_game_sessions_players WHERE session = ?');
+            const players = database.prepare('SELECT nickname, cups FROM duck_game_sessions_players WHERE session = ? ORDER BY cups DESC');
 
             const fields = [];
 
