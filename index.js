@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
-const { BOT_TOKEN } = require('./bot.json');
+const { BOT_TOKEN, BOT_INFO_CHANNEL } = require('./bot.json');
+const fs = require('fs');
 const config = require('./config.json');
 const invites = require('./commands/invites');
 const stats = require('./commands/stats');
@@ -19,6 +20,14 @@ client.on('ready', function() {
   let message = 0;
   const { BOT_MESSAGES } = config;
   const messages = BOT_MESSAGES.length;
+
+  const infoChannel = client.channels.cache.find(c => c.id === BOT_INFO_CHANNEL);
+
+  fs.readFile('./commit-message', function(err, data) {
+    infoChannel.send(`**Nouvelle mise à jour :**
+
+${data.toString().trim()}`);
+  });
 
   setInterval(function() {
     message = ++message % messages;
