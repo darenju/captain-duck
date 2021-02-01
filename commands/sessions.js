@@ -58,10 +58,10 @@ function register(client) {
                   message.channel.send(embed({
                     title: `Session de jeu de ${session.created_by} terminée !`,
                     description: `
-    Il y a eu ${session.rounds} rounds.
-    Voici le récapitulatif des coupes gagnées par les joueurs participants :
+Il y a eu ${session.rounds} rounds.
+Voici le récapitulatif des coupes gagnées par les joueurs participants :
 
-    `,
+`,
                     fields,
                     footer: {
                       text: `Session terminée par ${message.author.username}.`,
