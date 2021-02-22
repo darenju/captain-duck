@@ -29,7 +29,7 @@ client.on('ready', function() {
     if (message.length) {
       infoChannel.send(`**Nouvelle mise à jour :**
 
-  ${message}`);
+${message}`);
     }
   });
 
