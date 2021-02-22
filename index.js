@@ -24,9 +24,13 @@ client.on('ready', function() {
   const infoChannel = client.channels.cache.find(c => c.id === BOT_INFO_CHANNEL);
 
   fs.readFile('./commit-message', function(err, data) {
-    infoChannel.send(`**Nouvelle mise à jour :**
+    const message = data.toString().trim();
 
-${data.toString().trim()}`);
+    if (message.length) {
+      infoChannel.send(`**Nouvelle mise à jour :**
+
+  ${message}`);
+    }
   });
 
   setInterval(function() {

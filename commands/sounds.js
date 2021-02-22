@@ -3,6 +3,7 @@ const {
   BENNY_HILL_DURATION,
   ALI_BABA_DURATION,
   ALADDIN_DURATION,
+  CUNT_DURATION,
   SOUND_EFFECT_VOLUME,
 } = require('../config.json');
 const path = require('path');
@@ -11,6 +12,7 @@ const durations = {
   'alibaba': ALI_BABA_DURATION,
   'aladdin': ALADDIN_DURATION,
   'benny': BENNY_HILL_DURATION,
+  'cunt': CUNT_DURATION,
 };
 
 const availableSounds = Object.keys(durations);
