@@ -3,6 +3,7 @@ const { BOT_TOKEN, BOT_INFO_CHANNEL } = require('./bot.json');
 const fs = require('fs');
 const config = require('./config.json');
 const invites = require('./commands/invites');
+const deafen = require('./commands/deafen');
 const stats = require('./commands/stats');
 const weapons = require('./commands/weapons');
 const cups = require('./commands/cups');
@@ -50,6 +51,7 @@ const commands = [
 ].flat();
 
 invites.setup(client);
+deafen.setup(client);
 
 listen(client, function(message) {
   const { content } = message;
