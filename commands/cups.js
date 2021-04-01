@@ -124,8 +124,9 @@ function register(client) {
         const fields = [];
 
         let index = 0;
-        database.each('SELECT * FROM players WHERE cups IS NOT NULL ORDER BY cups DESC', function (err, row) {
+        database.each('SELECT * FROM players WHERE cups IS NOT NULL ORDER BY cups DESC, seasons DESC', function (err, row) {
           const cups = parseInt(row.cups, 10);
+          const seasons = parseInt(row.seasons, 10);
           const rounds = row.duck_game_rounds;
           let medal = ':medal:';
 
@@ -143,7 +144,7 @@ function register(client) {
 
           fields.push({
             name,
-            value: `**${cups}** :trophy: \t - (*${rounds} rounds*)`,
+            value: `**${cups}** :trophy: \t **${seasons}** :crown: \t - *${rounds} rounds*`,
             inline: false,
           });
 
