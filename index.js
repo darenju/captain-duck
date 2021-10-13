@@ -11,6 +11,7 @@ const ducks = require('./commands/ducks');
 const sessions = require('./commands/sessions');
 const sounds = require('./commands/sounds');
 const clean = require('./commands/clean');
+const status = require('./commands/status');
 const help = require('./commands/help');
 const { listen } = require('./utils');
 
@@ -22,17 +23,19 @@ client.on('ready', function() {
   const { BOT_MESSAGES } = config;
   const messages = BOT_MESSAGES.length;
 
-  const infoChannel = client.channels.cache.find(c => c.id === BOT_INFO_CHANNEL);
+  // Display message only in prod mode.
+  if (process.env.ENV !== 'DEV') {
+    const infoChannel = client.channels.cache.find(c => c.id === BOT_INFO_CHANNEL);
+    fs.readFile('./commit-message', function(err, data) {
+      const message = data.toString().trim();
 
-  fs.readFile('./commit-message', function(err, data) {
-    const message = data.toString().trim();
+      if (message.length) {
+        infoChannel.send(`**Nouvelle mise à jour :**
 
-    if (message.length) {
-      infoChannel.send(`**Nouvelle mise à jour :**
-
-${message}`);
-    }
-  });
+  ${message}`);
+      }
+    });
+  }
 
   setInterval(function() {
     message = ++message % messages;
@@ -48,6 +51,7 @@ const commands = [
   stats.register(client),
   sounds.register(client),
   clean.register(client),
+  status.register(client),
 ].flat();
 
 invites.setup(client);

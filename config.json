@@ -13,5 +13,6 @@
   "ALI_BABA_DURATION": 3,
   "ALADDIN_DURATION": 2,
   "CUNT_DURATION": 3,
-  "SOUND_EFFECT_VOLUME": 0.5
+  "SOUND_EFFECT_VOLUME": 0.5,
+  "NEW_WORLD_STATUS_URL": "https://www.newworld.com/fr-fr/support/server-status"
 }
